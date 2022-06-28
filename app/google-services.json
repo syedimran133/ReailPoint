@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "937409241404",
+    "firebase_url": "https://usemyport-b5e08-default-rtdb.firebaseio.com",
+    "project_id": "usemyport-b5e08",
+    "storage_bucket": "usemyport-b5e08.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:937409241404:android:0565a953a27d7a8c243e39",
+        "android_client_info": {
+          "package_name": "com.reail.point"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "937409241404-5t501ogn48ttda352gr5k8poce2chvb4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwnbQWbsFwMekiP38kM_cujWaae2bQ1UU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "937409241404-5t501ogn48ttda352gr5k8poce2chvb4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "937409241404-pocpjqbna04qfdtro3gmmvls0po1cmvk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.reliapoint"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

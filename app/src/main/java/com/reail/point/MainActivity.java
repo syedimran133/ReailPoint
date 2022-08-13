@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         preManager = new PreManager(MainActivity.this);
+        AppSingle.getInstance().initActivity(this);
         new Handler().postDelayed(() -> {
             if (isNetworkAvailable(MainActivity.this)) {
                 if (preManager.getIsLogin()) {

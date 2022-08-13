@@ -1,12 +1,9 @@
 package com.reail.point;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,104 +18,87 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.IndoorBuilding;
+import com.firebase.geofire.GeoLocation;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import com.firebase.geofire.GeoLocation;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterManager;
 import com.reail.point.ViewModel.FeatchData;
 import com.reail.point.model.LocationData;
 import com.reail.point.model.User;
 import com.reail.point.utiles.PreManager;
 import com.reail.point.utiles.Utility;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import static android.widget.Toast.*;
-
-public class MapsMarker extends Fragment {
+public class MapsMarker3 extends Fragment{
 
     private GoogleMap mMap;
     private View v;
-    private ImageView button_current;
-    private TextView button;
-    private PreManager preManager;
+    ImageView button_current;
+    TextView button;
+    PreManager preManager;
     public static int loc_type = 1;
     public static GeoLocation current_geo_loc = null;
     public static LatLng current_latlong = null;
-    public static GeoLocation search_geo_loc = null;
-    public static LatLng search_latlong = null;
-    public static GeoLocation geo_loc = null;
-    public LatLng latlong = null;
-    //public List<LocationData> locData;
+    public static GeoLocation search_geo_loc = new GeoLocation(51.5073509, -0.1277583);
+    public static LatLng search_latlong = new LatLng(51.5073509, -0.1277583);
+    public static GeoLocation geo_loc = new GeoLocation(51.5073509, -0.1277583);
+
+    public static List<LocationData> locData;
     public static List<LocationData> locDataSearch;
-    private EditText editTextSearch;
+    EditText editTextSearch;
+    //int l=0;
+    boolean loop = false;
     private LifecycleOwner owner;
-    private Map<Marker, String> markers = new HashMap<>();
-    private SupportMapFragment mMapFragment;
+    public LatLng latlong =  null;
+    SupportMapFragment mMapFragment;
     private FeatchData pageViewModel;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         owner = this;
-        preManager = new PreManager(getContext());
-        //current_latlong = new LatLng(preManager.getLat(),preManager.getLong());
-        //current_geo_loc = new GeoLocation(preManager.getLat(), preManager.getLong());
-        if (search_latlong != null) {
-            latlong = new LatLng(search_latlong.latitude, search_latlong.longitude);
-            geo_loc = search_geo_loc;
-        } else {
-            current_latlong = latlong = new LatLng(preManager.getLat(), preManager.getLong());
-            current_geo_loc = new GeoLocation(latlong.latitude, latlong.longitude);
-            geo_loc = current_geo_loc;
-        }
-
+        current_latlong = AppSingle.getInstance().getLatLng();
+        current_geo_loc = new GeoLocation(AppSingle.getInstance().getLatLng().latitude, AppSingle.getInstance().getLatLng().longitude);
+        geo_loc = current_geo_loc;
+        //pageViewModel = new ViewModelProvider(AppSingle.getInstance().getActivity()).get(FeatchData.class);
     }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.activity_maps, container, false);
+        preManager = new PreManager(getContext());
         pageViewModel = new ViewModelProvider(this, (ViewModelProvider.Factory) ViewModelProvider.AndroidViewModelFactory.getInstance(AppSingle.getInstance())).get(FeatchData.class);
+        pageViewModel.login(getContext(), preManager, geo_loc).observe(owner, locationData -> {
+            locData = locationData;
+            // Toast.makeText(getContext(), "" + locationData.size(), Toast.LENGTH_LONG).show();
 
-            pageViewModel.login(getContext(), preManager, geo_loc).observe(owner, locationData -> {
-                //locData = locationData;
-                // Toast.makeText(getContext(), "" + locationData.size(), Toast.LENGTH_LONG).show();
-                Utility.showProgressDialogue(getContext(), "", "Please wait......");
-                final Handler handler = new Handler();
-                handler.postDelayed(() -> {
+            Utility.showProgressDialogue(getContext(), "", "Please wait......");
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
                     // Do something after 5s = 5000ms
-                    Log.d("GeoQuery  CreateView post data size:: ",""+locationData.size());
                     Utility.cancelProgressDialogue();
-                    init(locationData);
-                }, 5000);
-            });
+                    init();
+                }
+            }, 5000);
 
+        });
         return v;
     }
 
-    @SuppressLint("PotentialBehaviorOverride")
-    void init(List<LocationData> locItems) {
+
+    void init() {
 
         try {
             ImageView iv_filter = v.findViewById(R.id.iv_filter);
@@ -149,13 +129,17 @@ public class MapsMarker extends Fragment {
                     geo_loc = search_geo_loc;
                     latlong = search_latlong;
                     pageViewModel.login(getContext(), preManager, geo_loc).observe(owner, locationData -> {
+                        locData = locationData;
                         // Toast.makeText(getContext(), "" + locationData.size(), Toast.LENGTH_LONG).show();
                         Utility.showProgressDialogue(getContext(), "", "Please wait......");
                         final Handler handler = new Handler();
-                        handler.postDelayed(() -> {
-                            Log.d("GeoQuery   button.setOnClickListener post data size:: ",""+locationData.size());
-                            Utility.cancelProgressDialogue();
-                            init(locationData);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
+                                Utility.cancelProgressDialogue();
+                                init();
+                            }
                         }, 5000);
                     });
                 }
@@ -163,15 +147,20 @@ public class MapsMarker extends Fragment {
             button_current.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    latlong = current_latlong;
                     geo_loc = current_geo_loc;
+                    latlong = current_latlong;
                     pageViewModel.login(getContext(), preManager, geo_loc).observe(owner, locationData -> {
+                        locData = locationData;
+                        // Toast.makeText(getContext(), "" + locationData.size(), Toast.LENGTH_LONG).show();
                         Utility.showProgressDialogue(getContext(), "", "Please wait......");
                         final Handler handler = new Handler();
-                        handler.postDelayed(() -> {
-                            Log.d("GeoQuery button_current.setOnClickListener post data size:: ",""+locationData.size());
-                            Utility.cancelProgressDialogue();
-                            init(locationData);
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // Do something after 5s = 5000ms
+                                Utility.cancelProgressDialogue();
+                                init();
+                            }
                         }, 5000);
                     });
                 }
@@ -195,21 +184,15 @@ public class MapsMarker extends Fragment {
                             button.setVisibility(View.GONE);
                         }
                     });
-                    mMap.setOnInfoWindowClickListener(arg0 -> {
-                        String markerName = markers.get(arg0);
-                        PointDetails frg=new PointDetails();
-                        frg.getValues(locItems,Utility.getItemSearch(locItems, markerName),this);
-                        FlowOrganizer.getInstance().add(frg, true);
-                    });
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(latlong));
                     animateZoomInCamera(latlong);
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    Circle circle = mMap.addCircle(new CircleOptions()
+                    mMap.addCircle(new CircleOptions()
                             .center(latlong)
                             .radius(1610 * preManager.getRadius())
                             .strokeColor(Color.parseColor("#cccccc"))
                             .fillColor(Color.parseColor("#66cccccc")));
-                    setMarker(googleMap, locItems);
+                    setMarker(googleMap,locData);
                     //drawMapCircle(mMap,latlong,circle);
 
                 });
@@ -219,11 +202,15 @@ public class MapsMarker extends Fragment {
         } catch (Exception e) {
             Toast.makeText(AppSingle.getInstance().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
+        try {
+
+        } catch (Exception e) {
+        }
     }
 
     void animateZoomInCamera(LatLng latLng) {
         if (3 >= preManager.getRadius()) {
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.5f));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12.3f));
         } else if (6 >= preManager.getRadius()) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11.7f));
         } else {
@@ -231,7 +218,7 @@ public class MapsMarker extends Fragment {
         }
     }
 
-    public void setMarker(GoogleMap googleMap, List<LocationData> data) {
+    public void setMarker(GoogleMap googleMap,List<LocationData> data) {
         try {
             List<LocationData> temp = null;
             if (Constant.subscribed) {
@@ -241,15 +228,31 @@ public class MapsMarker extends Fragment {
             }
             mMap = googleMap;
             List<User> items = Utility.getItems(temp);
-            for (int i = 0; i < items.size(); i++) {
-                Marker a = mMap.addMarker(new MarkerOptions().position(items.get(i).getPosition()).title(items.get(i).getTitle()).icon(Utility.BitmapFromVector(getContext(), items.get(i).getImage())));
-                markers.put(a, items.get(i).getTitle());
+            for (int i=0;i<items.size();i++){
+                if (!Constant.subscribed) {
+                    //markerImageView.setImageResource(Utility.getimgRes(item.getIndex()));
+                    mMap.addMarker(new MarkerOptions().position(items.get(i).getPosition()).title(items.get(i).getTitle())
+                            // below line is use to add custom marker on our map.
+                            .icon(Utility.BitmapFromVector(getContext(), Utility.getimgRes(data.get(i)))));
+                } else {
+                    //markerImageView.setImageResource(Utility.subUser(item.getIndex()));
+                    mMap.addMarker(new MarkerOptions().position(items.get(i).getPosition()).title(items.get(i).getTitle())
+                            // below line is use to add custom marker on our map.
+                            .icon(Utility.BitmapFromVector(getContext(), Utility.subUser(data.get(i)))));
+                }
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
             }
         } catch (Exception e) {
             Toast.makeText(AppSingle.getInstance().getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
         }
 
     }
+
+ /*   @Override
+    public void onClusterItemInfoWindowClick(User item) {
+        Constant.singalItemData = locData.get(item.getIndex());
+        FlowOrganizer.getInstance().add(new PointDetails(), true);
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -263,15 +266,16 @@ public class MapsMarker extends Fragment {
             search_geo_loc = geo_loc;
             search_latlong = latlong;
             pageViewModel.login(getContext(), preManager, geo_loc).observe(owner, locationData -> {
+                locData = locationData;
                 //Toast.makeText(getContext(), "" + locationData.size(), Toast.LENGTH_LONG).show();
                 Utility.showProgressDialogue(getContext(), "", "Please wait......");
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("GeoQuery search post data size:: ",""+locationData.size());
+                        // Do something after 5s = 5000ms
                         Utility.cancelProgressDialogue();
-                        init(locationData);
+                        init();
                     }
                 }, 5000);
             });

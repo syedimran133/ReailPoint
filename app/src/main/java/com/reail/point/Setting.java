@@ -33,11 +33,11 @@ public class Setting extends Fragment {
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                //preManager.c
-                Intent intent = new Intent(getContext(), LoginActivity.class);
-                startActivity(intent);
+                //FirebaseAuth.getInstance().signOut();
 				preManager.setIsLogin(false);
+                Intent intent = new Intent(AppSingle.getInstance().getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
+                AppSingle.getInstance().getActivity().finish();
             }
         });
         tvConditionsPrices.setOnClickListener(new View.OnClickListener() {

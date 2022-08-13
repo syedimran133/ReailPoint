@@ -40,6 +40,18 @@ public class PreManager {
     public int getRadius() {
         return sharedPreferences.getInt(Constant.RADIUS, 3);
     }
+
+    public void setLat(double value) { editor.putLong(Constant.LATITUDE, Double.doubleToRawLongBits(value)).apply();}
+    public double getLat() {
+        return Double.longBitsToDouble(sharedPreferences.getLong(Constant.LATITUDE, Double.doubleToLongBits(0)));
+    }
+
+    public void setLong(double value) { editor.putLong(Constant.LONGITUDE, Double.doubleToRawLongBits(value)).apply();}
+    public double getLong() {
+        return Double.longBitsToDouble(sharedPreferences.getLong(Constant.LONGITUDE, Double.doubleToLongBits(0)));
+    }
+
+
 	  public void setIsLogin(boolean is_login) { editor.putBoolean(Constant.IS_LOGIN, is_login).apply();}
     public boolean getIsLogin() {
         return sharedPreferences.getBoolean(Constant.IS_LOGIN, false);

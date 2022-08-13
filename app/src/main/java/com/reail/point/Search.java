@@ -70,7 +70,7 @@ public class Search extends Fragment {
         adpter.registerOnItemClickListener(new SearchAdpter.IonItemSelect() {
             @Override
             public void onItemSelect(int position) {
-                Constant.singalItemData=MapsMarker.locDataSearch.get(position);
+                //Constant.singalItemData=MapsMarker.locDataSearch.get(position);
                 FlowOrganizer.getInstance().add(new PointDetails(), true);
             }
         });

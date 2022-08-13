@@ -10,6 +10,8 @@ public class Constant {
     static final String AUTH_TOKEN = "authToken";
     public static final String PREF_NAME = "Signup_pref";
     public static final String RADIUS = "radius";
+     public static final String LATITUDE = "latitude";
+    public static final String LONGITUDE = "longitude";
     public static final String RELIABILITY = "reliability";
     public static final String POWERTYPE = "power_type";
     public static final String USER = "user";
@@ -25,7 +27,6 @@ public class Constant {
     public static String TITLE = "About Us";
     public static boolean subscribed = true;
     public static int radius = 3;
-    public static LocationData singalItemData=null;
     public static LoginUser singalUserData=null;
     public static final String BASE_URL_LINK = "http://mtf.ydns.eu/";
     // public static final String MAIN_BASE_URL="http://mtf.ydns.eu/index.php/api/";

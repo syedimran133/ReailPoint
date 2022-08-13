@@ -11,13 +11,14 @@ public class User implements ClusterItem {
     private final String username;
     private final LatLng latLng;
     private int index;
+    private int image;
 
-    public User(String username, LatLng latLng,int index) {
+
+    public User(String username, LatLng latLng,int image) {
         this.username = username;
         this.latLng = latLng;
-        this.index = index;
+        this.image = image;
     }
-
     @NonNull
     @Override
     public LatLng getPosition() {
@@ -42,5 +43,13 @@ public class User implements ClusterItem {
 
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    public int getImage() {
+        return image;
+    }
+
+    public void setImage(int image) {
+        this.image = image;
     }
 }

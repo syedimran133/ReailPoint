@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class LocationData {
+public class Locations {
     @SerializedName("connector1Type")
     @Expose
     private String connector1Type;
@@ -105,10 +105,6 @@ public class LocationData {
     @SerializedName("connector1Status")
     @Expose
     private String connector1Status;
-    @SerializedName("image")
-    @Expose
-    private String image;
-    private String path;
 
     public String getConnector1Type() {
         return connector1Type;
@@ -372,21 +368,5 @@ public class LocationData {
 
     public void setConnector1Status(String connector1Status) {
         this.connector1Status = connector1Status;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
     }
 }

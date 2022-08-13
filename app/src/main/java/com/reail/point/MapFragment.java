@@ -23,14 +23,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.reail.point.model.LocationData;
 
 public class MapFragment  extends Fragment {
     LatLng latLng;
     ImageView iv_back;
     TextView tvTitle;
-    public MapFragment(LatLng latLng) {
+    LocationData itemData;
+    public MapFragment(LatLng latLng,LocationData itemData) {
         // Required empty public constructor
         this.latLng=latLng;
+        this.itemData=itemData;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class MapFragment  extends Fragment {
         tvTitle=rootView.findViewById(R.id.tvTitle);
         iv_back=rootView.findViewById(R.id.iv_back);
 
-        tvTitle.setText(Constant.singalItemData.getName());
+        tvTitle.setText(itemData.getName());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.frg);  //use SuppoprtMapFragment for using in fragment instead of activity  MapFragment = activity   SupportMapFragment = fragment
         assert mapFragment != null;
         mapFragment.getMapAsync(mMap -> {
@@ -62,7 +65,7 @@ public class MapFragment  extends Fragment {
 
             mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latLng.latitude, latLng.longitude))
-                    .title(Constant.singalItemData.getName())
+                    .title(itemData.getName())
                     .icon(bitmapDescriptorFromVector(getActivity(),getimgRes())));
         });
 
@@ -73,20 +76,20 @@ public class MapFragment  extends Fragment {
         int res = R.drawable.green43;
         int currentCapacity1 = 0;
         try{
-            currentCapacity1 = Integer.parseInt(Constant.singalItemData.getOutputKW());
+            currentCapacity1 = Integer.parseInt(itemData.getOutputKW());
         }catch (Exception e){}
         int currentCapacity2 = 0;
         try{
-            currentCapacity2 = Integer.parseInt(Constant.singalItemData.getConnector2OutputKW());
+            currentCapacity2 = Integer.parseInt(itemData.getConnector2OutputKW());
         }catch (Exception e){}
         int currentCapacity3 = 0;
         try {
-            currentCapacity3 = Integer.parseInt(Constant.singalItemData.getConnector3OutputKW());
+            currentCapacity3 = Integer.parseInt(itemData.getConnector3OutputKW());
         } catch (Exception e) {
         }
         int currentCapacity4 = 0;
         try {
-            currentCapacity4 = Integer.parseInt(Constant.singalItemData.getConnector4OutputKW());
+            currentCapacity4 = Integer.parseInt(itemData.getConnector4OutputKW());
         } catch (Exception e) {
         }
         int maxValue = currentCapacity1;
@@ -100,7 +103,7 @@ public class MapFragment  extends Fragment {
             maxValue = currentCapacity4;
         }
 
-        if (Constant.singalItemData.getChargeDeviceStatus().equalsIgnoreCase("In service")) {
+        if (itemData.getChargeDeviceStatus().equalsIgnoreCase("In service")) {
             if (maxValue <= 7) {
                 res = R.drawable.green7;
             } else if (maxValue > 7 && maxValue <= 22) {

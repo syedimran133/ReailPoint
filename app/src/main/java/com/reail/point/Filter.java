@@ -39,12 +39,12 @@ public class Filter extends Fragment {
         radioGroup = (RadioGroup) v.findViewById(R.id.radioGroup);
         sbPower = v.findViewById(R.id.seekBar);
         sbPower.setProgress(preManager.getPowerType());
-		sbPower.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-		sbPower.getThumb().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        sbPower.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        sbPower.getThumb().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         sbRadius = v.findViewById(R.id.seekBar2);
         sbRadius.setProgress(preManager.getRadius());
-		sbRadius.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
-		sbRadius.getThumb().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        sbRadius.getProgressDrawable().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
+        sbRadius.getThumb().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN);
         rb_all = v.findViewById(R.id.rb_all);
         rb_not_working = v.findViewById(R.id.rb_not_working);
         rb_working = v.findViewById(R.id.rb_working);
@@ -54,12 +54,13 @@ public class Filter extends Fragment {
             @Override
             public void onClick(View v) {
                 addListenerOnButton();
-                FlowOrganizer.getInstance().add(new MapsMarker(),false);
+                FlowOrganizer.getInstance().add(new MapsMarker(), false);
             }
         });
         iv_back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addListenerOnButton();
                 FlowOrganizer.getInstance().popUpBackTo(1);
             }
         });
@@ -96,14 +97,15 @@ public class Filter extends Fragment {
         int radioButtonID = radioGroup.getCheckedRadioButtonId();
         View radioButton = radioGroup.findViewById(radioButtonID);
         preManager.setReliability(radioGroup.indexOfChild(radioButton) + 1);
-        if(sbPower.getProgress()<25){
+        if (sbPower.getProgress() < 25) {
             preManager.setPowerType(25);
-        }else{
-        preManager.setPowerType(sbPower.getProgress());}
-        if(sbRadius.getProgress()<3){
+        } else {
+            preManager.setPowerType(sbPower.getProgress());
+        }
+        if (sbRadius.getProgress() < 3) {
             preManager.setRadius(3);
-        }else{
-        preManager.setRadius(sbRadius.getProgress());
+        } else {
+            preManager.setRadius(sbRadius.getProgress());
         }
     }
 }

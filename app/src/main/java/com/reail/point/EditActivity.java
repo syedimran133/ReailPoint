@@ -24,7 +24,7 @@ import com.reail.point.utiles.PreManager;
 
 import java.util.Objects;
 
-public class EditActivity extends AppCompatActivity {
+public class  EditActivity extends AppCompatActivity {
 
     private TextView tvCancel, tvSave;
     EditText editTextName, editTextPhoneNumber;

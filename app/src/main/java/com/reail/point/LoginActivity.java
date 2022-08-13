@@ -45,14 +45,13 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tv_forgot_password, tv_sign_up, tv_sign_in;
     private EditText editTextEmail, editTextPassword;
     private String email, password, mErrorMsg = "Email is empty";
-    private FirebaseAuth mAuth;
+
     PreManager preManager;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_login);
         preManager = new PreManager(this);
-        mAuth = FirebaseAuth.getInstance();
         tv_forgot_password = findViewById(R.id.tv_forgot_password);
         tv_sign_up = findViewById(R.id.tv_sign_up);
         tv_sign_in = findViewById(R.id.tv_sign_in);
@@ -81,18 +80,15 @@ public class LoginActivity extends AppCompatActivity {
                     ProgressDialog progressDialog = new ProgressDialog(LoginActivity.this);
                     progressDialog.setMessage("Please wait ...");
                     progressDialog.show();
-                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            progressDialog.dismiss();
-                            if (task.isSuccessful()) {
-                                getDataLogin();
-								preManager.setIsLogin(true);
-                            } else {
-                                Log.w("TAG", "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(getApplicationContext(), "Sign-in failed. " + task.getException().getLocalizedMessage(),
-                                        Toast.LENGTH_LONG).show();
-                            }
+                    AppSingle.getInstance().getmAuth().signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                        progressDialog.dismiss();
+                        if (task.isSuccessful()) {
+                            getDataLogin();
+                            preManager.setIsLogin(true);
+                        } else {
+                            Log.w("TAG", "createUserWithEmail:failure", task.getException());
+                            Toast.makeText(getApplicationContext(), "Sign-in failed. " + task.getException().getLocalizedMessage(),
+                                    Toast.LENGTH_LONG).show();
                         }
                     });
 
@@ -162,5 +158,12 @@ public class LoginActivity extends AppCompatActivity {
                 progressDialog2.dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        editTextEmail.setText("");
+        editTextPassword.setText("");
     }
 }

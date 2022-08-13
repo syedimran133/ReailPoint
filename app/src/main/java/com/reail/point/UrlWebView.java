@@ -33,11 +33,11 @@ public class UrlWebView extends Fragment {
         });
         mWebView = v.findViewById(R.id.web_view);
         if (Constant.TITLE.equalsIgnoreCase("About Us")) {
-            mWebView.loadUrl("https://www.giveplug.com/#whatsgiveplug");
+            mWebView.loadUrl("https://reliapoint.co.uk/");
         } else if (Constant.TITLE.equalsIgnoreCase("Terms & Conditions")) {
-            mWebView.loadUrl("https://www.giveplug.com/how-it-works/");
+            mWebView.loadUrl("https://reliapoint.co.uk/terms/");
         } else if (Constant.TITLE.equalsIgnoreCase("Privacy Policy")) {
-            mWebView.loadUrl("https://www.giveplug.com/explore/");
+            mWebView.loadUrl("https://reliapoint.co.uk/privacy-policy/");
         }
         // Enable Javascript
         WebSettings webSettings = mWebView.getSettings();

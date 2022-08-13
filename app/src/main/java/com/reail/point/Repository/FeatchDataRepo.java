@@ -35,74 +35,83 @@ public class FeatchDataRepo {
     //this is the data that we will fetch asynchronously
     private MutableLiveData<List<LocationData>> loginData;
 
-    public void featchData(Context mContext,PreManager preManager, GeoLocation geo_loc) {
-        Utility.showProgressDialogue(mContext,"","Please wait..");
+    public void featchData(Context mContext, PreManager preManager, GeoLocation geo_loc) {
+        Utility.showProgressDialogue(mContext, "", "Please wait..");
         if (loginData == null) {
             loginData = new MutableLiveData<>();
         }
         ArrayList<String> keys = new ArrayList<>();
-		//Toast.makeText(mContext,""+preManager.getRadius(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(mContext,""+preManager.getRadius(), Toast.LENGTH_LONG).show();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("locations");
         GeoFire geoFire = new GeoFire(reference);
-		GeoQuery query  = geoFire.queryAtLocation(geo_loc, 1.60934 * preManager.getRadius());
+        GeoQuery query = geoFire.queryAtLocation(geo_loc, preManager.getRadius());
+        Log.d("GeoQuery Radius :: ",""+preManager.getRadius());
+        Log.d("GeoQuery Latitude :: ",""+geo_loc.latitude);
+        Log.d("GeoQuery Longitude :: ",""+geo_loc.longitude);
         query.addGeoQueryEventListener(new GeoQueryEventListener() {
 
             @Override
             public void onKeyEntered(String key, GeoLocation location) {
-               // Utility.cancelProgressDialogue();
-			 
+                // Utility.cancelProgressDialogue();
+
                 keys.add(key);
                 //Toast.makeText(getApplicationContext(),"onKeyEntered"+key,Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onKeyExited(String key) {
-              // Utility.cancelProgressDialogue();
+                // Utility.cancelProgressDialogue();
                 //Toast.makeText(getApplicationContext(),"onKeyExited ",Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-              // Utility.cancelProgressDialogue();
+                // Utility.cancelProgressDialogue();
                 //Toast.makeText(getApplicationContext(),"onKeyMoved",Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onGeoQueryReady() {
                 List<LocationData> locData = new ArrayList<>();
-				 ArrayList<String> vals = new ArrayList<>();
+                //ArrayList<String> vals = new ArrayList<>();
                 DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-				//Toast.makeText(mContext,"keys :-"+keys.size(),Toast.LENGTH_LONG).show();
+                //Toast.makeText(mContext,"keys :-"+keys.size(),Toast.LENGTH_LONG).show();
+                Log.d("GeoQuery  keys size:: ",""+keys.size());
                 for (int i = 0; i < keys.size(); i++) {
                     DatabaseReference ref = database.child("locations/" + keys.get(i));
                     final int k = i;
+                    String loc = keys.get(i) + "";
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                           // try {
-								//vals.add(new Gson().toJson(dataSnapshot.getValue()));
-                                locData.add(new Gson().fromJson(new Gson().toJson(dataSnapshot.getValue()), LocationData.class));
-                            /*} catch (Exception e) {
-                                Log.e("Error " + k + " ::", e.getLocalizedMessage());
-								Toast.makeText(mContext,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                            }*/
+                            try {
+                                LocationData data = new Gson().fromJson(new Gson().toJson(dataSnapshot.getValue()), LocationData.class);
+                                data.setPath(loc);
+                                if (data.getReliabilityRating() == null) {
+                                    data.setReliabilityRating("");
+                                }
+                                locData.add(data);
+                            } catch (Exception e) {
+                                Log.d("GeoQuery Error :: ",e.getMessage());
+                            }
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-							 Log.e("Error " + k + " ::", databaseError.getMessage());
-							 Toast.makeText(mContext,"error :-",Toast.LENGTH_LONG).show();
+                            Log.d("GeoQuery Error " + k + " ::", databaseError.getMessage());
+                            Toast.makeText(mContext, "GeoQuery error :-", Toast.LENGTH_LONG).show();
                         }
 
                     });
                 }
-				loginData.postValue(locData);
-               Utility.cancelProgressDialogue();
+                loginData.postValue(locData);
+                //
+                Utility.cancelProgressDialogue();
             }
 
             @Override
             public void onGeoQueryError(DatabaseError error) {
-                 Utility.cancelProgressDialogue();
+                Utility.cancelProgressDialogue();
                 Toast.makeText(mContext, "onGeoQueryError", Toast.LENGTH_LONG).show();
             }
         });
@@ -111,5 +120,5 @@ public class FeatchDataRepo {
     public MutableLiveData<List<LocationData>> getData() {
         return loginData;
     }
-   
+
 }

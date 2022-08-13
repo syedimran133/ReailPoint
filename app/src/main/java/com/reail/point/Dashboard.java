@@ -2,6 +2,8 @@ package com.reail.point;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +14,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.firebase.geofire.GeoFire;
@@ -20,6 +24,7 @@ import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryBounds;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -33,6 +38,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.reail.point.model.LocData;
 import com.reail.point.model.LocationData;
+import com.reail.point.utiles.GpsTracker;
 import com.reail.point.utiles.PreManager;
 import com.reail.point.utiles.Utility;
 
@@ -48,19 +54,28 @@ public class Dashboard extends AppCompatActivity {
     private LinearLayout layout_Setting;
     private Context mContext;
     PreManager preManager;
+    private LocationManager locationManager;
+    private GpsTracker gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_dashboard);
         mContext = this;
+        try {
+            if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         preManager = new PreManager(this);
         fragments_container = findViewById(R.id.fragment_container);
         layout_Setting = findViewById(R.id.layout_Setting);
         AppSingle.getInstance().initActivity(this);
         FlowOrganizer.getInstance().initParentFrame(fragments_container);
-        FlowOrganizer.getInstance().add(new MapsMarker(),true);
         //getData();
+        getLocation();
         layout_Setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,6 +107,10 @@ public class Dashboard extends AppCompatActivity {
             }
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+        LatLng lt=new LatLng(preManager.getLat(),preManager.getLong());
+        if(lt!=null){
+            FlowOrganizer.getInstance().add(new MapsMarker(),true);
         }
     }
 
@@ -141,6 +160,17 @@ public class Dashboard extends AppCompatActivity {
             }
         });
     }
-
+    public void getLocation(){
+        gpsTracker = new GpsTracker(Dashboard.this);
+        if(gpsTracker.canGetLocation()){
+            double latitude = gpsTracker.getLatitude();
+            double longitude = gpsTracker.getLongitude();
+            preManager.setLat(latitude);
+            preManager.setLong(longitude);
+            AppSingle.getInstance().setLatLng(new LatLng(latitude,longitude));
+        }else{
+            gpsTracker.showSettingsAlert();
+        }
+    }
 
 }
